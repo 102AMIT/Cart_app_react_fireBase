@@ -2,9 +2,13 @@
 import CartItem from "./Components/CartItem";
 function App() {
   return (
-    <div className="App">
+    <div className="cart">
      
       <CartItem />
+      <CartItem />
+      <CartItem />
+      <CartItem />
+
     </div>
   );
 }
