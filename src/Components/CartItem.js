@@ -1,49 +1,14 @@
 import React, { Component } from 'react'
 
-export default class CartItem extends Component {
+const CartItem=(props)=> {
 
-  // when ever we are using arrow function this bind with the instance of the class
-  // increaseQuantity=()=>{
-  //  console.log(this.state)
-  //   // method 1
-  //   // this.setState({
-  //   //   qty:this.state.qty+1 //this known as shallow merging after set state react will re render the property
-  //   // });
-  //   // mathod 2
-  //   // when we need previous state then we use this
-  //   this.setState((prevState)=>{
-  //     return {
-  //       qty:prevState.qty+1
-  //     }
-  //   });
-  // }
-  // decreaseQuantity=()=>{
-  //   if(this.state.qty==0){
-  //     return;
-  //   }
-
-  //   // this.state.qty += 1
-  //   console.log(this.state)
-  //   // this.setState({
-  //   //   qty:this.state.qty-1
-  //   // });
-  //   this.setState((prevState)=>{
-  //     return {
-  //       qty:prevState.qty+1
-  //     }
-  //   });
-  // }
-
-
-
-  render() {
-    const { price, title, qty, img } = this.props.product;
-    const { product, onIncreaseQuantity, onDecreaseQuantity, onDeleteProduct } = this.props;
-    console.log(this.props)
+    const { price, title, qty, img } = props.product;
+    const { product, onIncreaseQuantity, onDecreaseQuantity, onDeleteProduct } = props;
+    
     return (
       <div className='cart-item'>
         <div className='left-block'>
-          <img style={styles.image} />
+          <img style={styles.image} src={product.img} />
         </div>
         <div className='right-block'>
           <div style={{ fontSize: 25 }}>{title}</div>
@@ -61,7 +26,8 @@ export default class CartItem extends Component {
       </div>
     )
   }
-}
+
+
 
 // we are using styles like this
 const styles = {
@@ -73,3 +39,4 @@ const styles = {
 
   }
 }
+export default CartItem;
