@@ -15,14 +15,42 @@ class App extends React.Component {
        loading:true
     }
     // this.increaseQuantity=this.increaseQuantity.bind(this);
+
+    this.db=firebase.firestore()
 }
 
 componentDidMount(){
-      firebase
-      .firestore()
+      this.db
       .collection('products')
-      .get()
-      .then((snapshot)=>{
+      // here we are query the data using where like sql
+      // .where('price','==',999)
+      // .where('title','==','Mobile Phone')
+      // .orderBy('price','desc')
+         .orderBy('price')
+
+
+
+
+      // here we are using onSnapshot beacuse when we are changing in firebase the changes reflected on client side
+      // using get we can't achive this
+
+      // .get()
+      // .then((snapshot)=>{
+      //   console.log(snapshot);
+      //   snapshot.docs.map((doc)=>{
+      //     console.log(doc.data());
+      //   })
+      //   const products=snapshot.docs.map((doc)=>{
+      //     const data=doc.data();
+      //     data['id']=doc.id;
+      //     return data;
+      //   })
+      //   this.setState({
+      //     products,
+      //     loading:false
+      //   })
+      // })
+      .onSnapshot((snapshot)=>{
         console.log(snapshot);
         snapshot.docs.map((doc)=>{
           console.log(doc.data());
@@ -40,15 +68,26 @@ componentDidMount(){
    
 }
 
+
 handleIncreaseQuantity=(product)=>{
     console.log('update the quantity ',product)
     const {products}=this.state;
     const index=products.indexOf(product);
-    products[index].qty+=1
+    // products[index].qty+=1
 
-    this.setState({
-        products:products
-    })
+    // this.setState({
+    //     products:products
+    // });
+
+    const docRef=this.db.collection('products').doc(products[index].id);
+    docRef.update({
+      qty:products[index].qty+1
+    }).then(()=>{
+      console.log('Updated successfully');
+    }).catch((error)=>{
+      console.log('Error',error);
+    });
+
 }
 handleDecreaseQuantity=(product)=>{
   console.log('update the quantity ',product)
@@ -57,20 +96,36 @@ handleDecreaseQuantity=(product)=>{
   if(products[index].qty===0){
     return;
   }
-  products[index].qty-=1
+  // products[index].qty-=1
 
-  this.setState({
-      products:products
-  })
+  // this.setState({
+  //     products:products
+  // })
+  const docRef=this.db.collection('products').doc(products[index].id);
+    docRef.update({
+      qty:products[index].qty-1
+    }).then(()=>{
+      console.log('Updated successfully');
+    }).catch((error)=>{
+      console.log('Error',error);
+    });
 }
 
 handleDeleteProduct=(id)=>{
-const {products}=this.state;
+   const {products}=this.state;
 
-const items=products.filter((item)=>item.id!==id);//return another array
-this.setState({
-  products:items
-})
+  // const items=products.filter((item)=>item.id!==id);//return another array
+  // this.setState({
+  //   products:items
+  // })
+  const docRef=this.db.collection('products').doc(id);
+  docRef.delete()
+  .then(()=>{
+    console.log('Delete successfully');
+  }).catch((error)=>{
+    console.log('Error',error);
+  });
+
 }
 
 getCartCount=()=>{
@@ -78,7 +133,7 @@ getCartCount=()=>{
   let count=0;
 
   products.forEach((product)=>{
-    count+=product.qty;
+    count+=+product.qty;
   })
 
   return count;
@@ -97,11 +152,29 @@ getCartTotal=()=>{
   return cartTotal;
 }
 
+addProduct=()=>{
+  this.db
+  .collection('products')
+  .add({
+    img:'https://cdn1.smartprix.com/rx-i6gTE5YIQ-w1200-h1200/6gTE5YIQ.jpg',
+    price:900,
+    qty:3,
+    title:"Washing Machine"
+  })
+  .then((docRef)=>{
+    console.log("Product Is Added",docRef);
+  })
+  .catch((error)=>{
+    console.log('Error',error)
+  })
+}
+
   render(){
   const {products,loading}=this.state;
   return (
     <div className="cart">
-      <Navbar count={this.getCartCount()}/>
+      <Navbar count={this.getCartCount()} />
+      <button onClick={this.addProduct} style={{padding:20 , frontSize:20}}>Add Product</button>
       <Cart 
         products={products}
         onIncreaseQuantity={this.handleIncreaseQuantity}
